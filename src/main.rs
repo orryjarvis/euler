@@ -20,6 +20,9 @@ fn p1(n: u128) -> u128 {
 }
 
 fn p2(n: u128) -> u128 {
+    // 100 is sort of magic to prevent overflow.. which
+    // is a sign that this sort of solution is not what 
+    // the problem author had intended :)
     (1..=100)
         .map(|x| lib::fib(x))
         .filter(|x| x <= &n)
