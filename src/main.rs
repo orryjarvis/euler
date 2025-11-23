@@ -21,12 +21,8 @@ fn p1(n: u128) -> u128 {
 }
 
 fn p2(n: u128) -> u128 {
-    // 100 is sort of magic to prevent overflow.. which
-    // is a sign that this sort of solution is not what 
-    // the problem author had intended :)
-    (1..=100)
+    (1..=lib::fib_largest_lte(n))
         .map(|x| lib::fib(x))
-        .filter(|x| x <= &n)
         .filter(|x| x % 2 == 0)
         .sum()
 }
@@ -43,7 +39,7 @@ fn p3(n: u128) -> u128 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_p0() {
         assert_eq!(28338577333241000, p0(554_000))

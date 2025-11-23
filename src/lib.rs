@@ -1,29 +1,27 @@
-
+#![feature(more_float_constants)]
 pub mod lib {
-    use lazy_static::lazy_static;
-    use std::collections::HashMap;
-    use std::sync::Mutex;
+    // use lazy_static::lazy_static;
+    // use std::collections::HashMap;
+    // use std::sync::Mutex;
 
-    lazy_static! {
-        static ref FIB: Mutex<HashMap<u128, u128>> = {
-            Mutex::new(HashMap::new())
-        };
-    }
+    // lazy_static! {
+    //     static ref FIB: Mutex<HashMap<u128, u128>> = {
+    //         Mutex::new(HashMap::new())
+    //     };
+    // }
 
-    pub fn fib(n: u128) -> u128 {
-        let mut fib_map = FIB.lock().unwrap();
-        if let Some(cache_hit) = fib_map.get(&n) {
-            return *cache_hit;
-        }
-        drop(fib_map);
+    pub fn fib(n: i32) -> u128 {
         let computed = match n {
             0 => 0,
             1 => 1,
             x => fib(x - 1) + fib(x - 2)
         };
-        fib_map = FIB.lock().unwrap();
-        fib_map.insert(n, computed);
         computed
+    }
+
+    pub fn fib_largest_lte(n: u128) -> i32 {
+        let x = f32::sqrt(5.0) * (n as f32 + 0.5);
+        x.log(std::f32::consts::PHI).floor() as i32
     }
 
     pub fn is_prime(n: u128) -> bool {
@@ -50,6 +48,15 @@ pub mod lib {
             assert_eq!(8, fib(6));
             assert_eq!(2, fib(3));
             assert_eq!(3, fib(4));
+        }
+
+        #[test]
+        fn test_fib_largest_lte() {
+            assert_eq!(0, fib_largest_lte(0));
+            assert_eq!(2, fib_largest_lte(1));
+            assert_eq!(4, fib_largest_lte(3));
+            assert_eq!(6, fib_largest_lte(10));
+            assert_eq!(7, fib_largest_lte(15));
         }
 
         
