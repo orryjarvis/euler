@@ -17,8 +17,8 @@ pub mod lib {
         }
         drop(fib_map);
         let computed = match n {
+            0 => 0,
             1 => 1,
-            2 => 2,
             x => fib(x - 1) + fib(x - 2)
         };
         fib_map = FIB.lock().unwrap();
@@ -43,11 +43,13 @@ pub mod lib {
 
         #[test]
         fn test_fib() {
+            assert_eq!(0, fib(0));
             assert_eq!(1, fib(1));
-            assert_eq!(2, fib(2));
-            assert_eq!(8, fib(5));
-            assert_eq!(3, fib(3));
-            assert_eq!(5, fib(4));
+            assert_eq!(1, fib(2));
+            assert_eq!(5, fib(5));
+            assert_eq!(8, fib(6));
+            assert_eq!(2, fib(3));
+            assert_eq!(3, fib(4));
         }
 
         

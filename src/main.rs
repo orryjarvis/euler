@@ -38,3 +38,29 @@ fn p3(n: u128) -> u128 {
         .filter(|x| lib::is_prime(*x))
         .last().unwrap()
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_p0() {
+        assert_eq!(28338577333241000, p0(554_000))
+    }
+
+    #[test]
+    fn test_p1() {
+        assert_eq!(233168, p1(1000))
+    }
+
+    #[test]
+    fn test_p2() {
+        assert_eq!(4613732, p2(4_000_000))
+    }
+
+    #[test]
+    fn test_p3() {
+        assert_eq!(6857, p3(600_851_475_143))
+    }
+}
