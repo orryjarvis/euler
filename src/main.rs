@@ -1,4 +1,4 @@
-use euler::lib;
+use euler::num;
 
 fn main() {
     println!("p0: {:?}", p0(554_000));
@@ -21,8 +21,8 @@ fn p1(n: u128) -> u128 {
 }
 
 fn p2(n: u128) -> u128 {
-    (1..=lib::fib_largest_lte(n))
-        .map(|x| lib::fib(x))
+    (1..=num::fib_largest_lte(n))
+        .map(|x| num::fib(x))
         .filter(|x| x % 2 == 0)
         .sum()
 }
@@ -31,7 +31,7 @@ fn p3(n: u128) -> u128 {
     let upper: u128 = f64::floor(f64::sqrt(n as f64)) as u128;
     (1..=upper)
         .filter(|x| n % x == 0)
-        .filter(|x| lib::is_prime(*x))
+        .filter(|x| num::is_prime(*x))
         .last().unwrap()
 }
 
