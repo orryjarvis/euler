@@ -46,8 +46,9 @@ pub fn is_prime(n: u128) -> bool {
 
 pub fn prime_iterator() -> impl Iterator<Item=u128> {
     let c = #[coroutine] || -> ! {
-        let mut primes: Vec<(u128, u128)> = Vec::new();
-        let mut num = 2_u128;
+        yield 2_u128;
+        let mut primes: Vec<(u128, u128)> = vec![(2_u128, 2_128)];
+        let mut num = 3_u128;
         loop {
             let mut is_prime = true;
             for p in primes.iter_mut() {
@@ -63,7 +64,7 @@ pub fn prime_iterator() -> impl Iterator<Item=u128> {
                 primes.push((num, num));
                 yield num;
             }
-            num += 1;
+            num += 2;
         }
     };
     generator::create_infinite_generator(c)
