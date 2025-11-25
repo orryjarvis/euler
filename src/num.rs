@@ -9,7 +9,7 @@
 // }
 use std::mem;
 
-use crate::generator::{create_generator};
+use crate::generator;
 
 pub fn fib(n: i32) -> u128 {
     let computed = match n {
@@ -26,7 +26,7 @@ pub fn fib_largest_lte(n: u128) -> i32 {
 }
 
 pub fn fib_iterator() -> impl Iterator<Item=u128> {
-    let c = #[coroutine] || {
+    let c = #[coroutine] || -> ! {
         yield 0;
         yield 1;
         let mut a  = 0_u128;
@@ -38,7 +38,7 @@ pub fn fib_iterator() -> impl Iterator<Item=u128> {
         }
 
     };
-    return create_generator(c);
+    return generator::create_infinite_generator(c);
 }
 
 pub fn is_prime(n: u128) -> bool {
@@ -53,9 +53,10 @@ pub fn is_prime(n: u128) -> bool {
 }
 
 pub fn prime_iterator() -> impl Iterator<Item=u128> {
-    let c = #[coroutine] || {
+    let c = #[coroutine] || -> ! {
         let mut primes: Vec<(u128, u128)> = Vec::new();
-        for num in 2_u128.. {
+        let mut num = 2_u128;
+        loop {
             let mut is_prime = true;
             for p in primes.iter_mut() {
                 while p.1 < num {
@@ -70,8 +71,10 @@ pub fn prime_iterator() -> impl Iterator<Item=u128> {
                 primes.push((num, num));
                 yield num;
             }
+            num += 1;
         }
     };
+    generator::create_infinite_generator(c)
     create_generator(c)
 }
 

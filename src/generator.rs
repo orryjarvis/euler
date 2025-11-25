@@ -8,6 +8,12 @@ where C: Coroutine<Yield = T, Return = ()>,
     done: bool,
 }
 
+pub struct InfiniteGenerator<C, T>
+where C: Coroutine<Yield = T, Return = !>,
+{
+    coroutine: Pin<Box<C>>
+}
+
 impl<C, T> Iterator for Generator<C, T>
 where
     C: Coroutine<Yield = T, Return = ()>,
@@ -29,9 +35,30 @@ where
     }
 }
 
+impl<C, T> Iterator for InfiniteGenerator<C, T>
+where
+    C: Coroutine<Yield = T, Return = !>,
+{
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.coroutine.as_mut().resume(()) {
+            CoroutineState::Yielded(val) => Some(val),
+            CoroutineState::Complete(never) => match never {}
+        }
+    }
+}
+
 pub fn create_generator<C, T>(coroutine: C) -> Generator<C, T>
 where
     C: Coroutine<Yield = T, Return = ()>,
 {
     Generator { coroutine: Box::pin(coroutine), done: false }
+}
+
+pub fn create_infinite_generator<C, T>(coroutine: C) -> InfiniteGenerator<C, T>
+where
+    C: Coroutine<Yield = T, Return = !>,
+{
+    InfiniteGenerator { coroutine: Box::pin(coroutine) }
 }
