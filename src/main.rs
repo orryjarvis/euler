@@ -31,20 +31,20 @@ fn p2(n: u128) -> u128 {
         .sum()
 }
 
-fn p3(n: u128) -> u128 {
+fn p3(n: u128) -> Option<u128> {
     let upper: u128 = f64::floor(f64::sqrt(n as f64)) as u128;
     (1..=upper)
         .filter(|x| n % x == 0)
         .filter(|x| num::is_prime(*x))
-        .last().unwrap()
+        .last()
 }
 
-fn p4(n: u32) -> u32 {
+fn p4(n: u32) -> Option<u32> {
     let mut palindromes = num::descending_product_iterator(n)
         .map(|(a, b)| a * b)
         .filter(|x| string::is_palindrome(x.to_string().as_str()))
         .peekable();
-    return palindromes.peek().unwrap().to_owned();
+    return palindromes.peek().map(|x| x.to_owned());
 }
 
 fn p5(_: u128) -> u128 {
@@ -55,8 +55,8 @@ fn p6(n: u32) -> u32 {
     ((n * (n + 1))/2).pow(2) - (((n.pow(2) + n) * (2 * n + 1))/6)
 }
 
-fn p7(n: u128) -> u128 {
-    num::prime_iterator().take(n as usize).last().unwrap()
+fn p7(n: u128) -> Option<u128> {
+    num::prime_iterator().take(n as usize).last()
 }
 
 #[cfg(test)]
@@ -80,12 +80,12 @@ mod tests {
 
     #[test]
     fn test_p3() {
-        assert_eq!(6857, p3(600_851_475_143))
+        assert_eq!(Some(6857), p3(600_851_475_143))
     }
 
     #[test]
     fn test_p4() {
-        assert_eq!(906_609, p4(3))
+        assert_eq!(Some(906_609), p4(3))
     }
 
     #[test]
@@ -100,6 +100,6 @@ mod tests {
 
     #[test]
     fn test_p7() {
-        assert_eq!(104_743, p7(10_001))
+        assert_eq!(Some(104_743), p7(10_001))
     }
 }
