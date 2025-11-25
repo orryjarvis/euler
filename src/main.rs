@@ -1,10 +1,11 @@
-use euler::num;
+use euler::{num, string};
 
 fn main() {
     println!("p0: {:?}", p0(554_000));
     println!("p1: {:?}", p1(1000));
     println!("p2: {:?}", p2(4_000_000));
     println!("p3: {:?}", p3(600_851_475_143));
+    println!("p4: {:?}", p4(3));
 }
 
 fn p0(n: u128) -> u128 {
@@ -33,6 +34,16 @@ fn p3(n: u128) -> u128 {
         .filter(|x| n % x == 0)
         .filter(|x| num::is_prime(*x))
         .last().unwrap()
+}
+
+
+
+fn p4(n: u32) -> u32 {
+    let mut palindromes = num::descending_product_iterator(n)
+        .map(|(a, b)| a * b)
+        .filter(|x| string::is_palindrome(x.to_string().as_str()))
+        .peekable();
+    return palindromes.peek().unwrap().to_owned();
 }
 
 

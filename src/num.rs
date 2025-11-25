@@ -1,13 +1,5 @@
-// use lazy_static::lazy_static;
-// use std::collections::HashMap;
-// use std::sync::Mutex;
-
-// lazy_static! {
-//     static ref FIB: Mutex<HashMap<u128, u128>> = {
-//         Mutex::new(HashMap::new())
-//     };
-// }
 use std::mem;
+use std::collections::{BinaryHeap, HashSet};
 
 use crate::generator;
 
@@ -75,7 +67,39 @@ pub fn prime_iterator() -> impl Iterator<Item=u128> {
         }
     };
     generator::create_infinite_generator(c)
-    create_generator(c)
+}
+
+pub fn descending_product_iterator(digits: u32) -> impl Iterator<Item=(u32, u32)>
+{    
+    let c = #[coroutine] move || {
+        let max = 10_u32.pow(digits) - 1;
+        
+        // Max heap of (product, i, j) tuples
+        // BinaryHeap is max-heap by default, perfect for descending order
+        let mut heap: BinaryHeap<(u32, u32, u32)> = BinaryHeap::new();
+        let mut seen: HashSet<(u32, u32)> = HashSet::new();
+        
+        // Start with the maximum product
+        heap.push((max * max, max, max));
+        seen.insert((max, max));
+        
+        while let Some((_product, i, j)) = heap.pop() {
+            yield (i, j);
+            
+            // Add neighbors: (i-1, j) and (i, j-1)
+            // We only generate pairs where i >= j to avoid duplicates
+            if i > 1 && j <= i - 1 && !seen.contains(&(i - 1, j)) {
+                seen.insert((i - 1, j));
+                heap.push(((i - 1) * j, i - 1, j));
+            }
+            
+            if j > 1 && !seen.contains(&(i, j - 1)) {
+                seen.insert((i, j - 1));
+                heap.push((i * (j - 1), i, j - 1));
+            }
+        }
+    };
+    generator::create_generator(c)
 }
 
 #[cfg(test)]
@@ -138,5 +162,17 @@ mod tests {
         assert_eq!(Some(8), i.next());
         assert_eq!(Some(13), i.next());
         assert_eq!(Some(21), i.next());
+    }
+    
+    #[test]
+    fn test_descending_product_iterator_order() {
+        let tuples: Vec<(u32, u32)> = descending_product_iterator(2).collect();
+        println!("{:?}", tuples);
+        let products = tuples
+            .iter()
+            .map(|(a,b)| a * b)
+            .collect::<Vec<_>>();
+        println!("{:?}", products);
+        assert!(products.iter().rev().is_sorted())
     }
 }
