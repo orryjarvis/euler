@@ -8,6 +8,7 @@ fn main() {
     println!("p4: {:?}", p4(3));
     println!("p5: {:?}", p5(20));
     println!("p6: {:?}", p6(100));
+    println!("p7: {:?}", p7(10_001));
 }
 
 fn p0(n: u128) -> u128 {
@@ -53,6 +54,11 @@ fn p5(_: u128) -> u128 {
 fn p6(n: u32) -> u32 {
     ((n * (n + 1))/2).pow(2) - (((n.pow(2) + n) * (2 * n + 1))/6)
 }
+
+fn p7(n: u128) -> u128 {
+    num::prime_iterator().take(n as usize).last().unwrap()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -90,5 +96,10 @@ mod tests {
     #[test]
     fn test_p6() {
         assert_eq!(25_164_150, p6(100))
+    }
+
+    #[test]
+    fn test_p7() {
+        assert_eq!(104_743, p7(10_001))
     }
 }
