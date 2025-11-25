@@ -1,5 +1,4 @@
-use std::mem;
-use std::collections::{BinaryHeap, HashSet};
+use std::collections::{BinaryHeap, HashSet, HashMap};
 
 use crate::generator;
 
@@ -19,16 +18,15 @@ pub fn fib_largest_lte(n: u128) -> i32 {
 
 pub fn fib_iterator() -> impl Iterator<Item=u128> {
     let c = #[coroutine] || -> ! {
-        yield 0;
-        yield 1;
-        let mut a  = 0_u128;
-        let mut b = 1_u128;
-        loop {
-            yield a + b;
-            mem::swap(&mut a, &mut b);
-            b = a + b;
-        }
+        let mut a: u128 = 0;
+        let mut b: u128 = 1;
 
+        loop {
+            yield a;
+            let next = a + b;
+            a = b;
+            b = next;
+        }
     };
     return generator::create_infinite_generator(c);
 }
@@ -45,26 +43,60 @@ pub fn is_prime(n: u128) -> bool {
 }
 
 pub fn prime_iterator() -> impl Iterator<Item=u128> {
-    let c = #[coroutine] || -> ! {
+    let c = #[coroutine]
+    || -> ! {
+        // Yield 2 separately so we can skip all even numbers afterward.
         yield 2_u128;
-        let mut primes: Vec<(u128, u128)> = vec![(2_u128, 2_128)];
-        let mut num = 3_u128;
+
+        // Map: composite -> step (the increment to get the next composite for a given prime)
+        let mut composites: HashMap<u128, u128> = HashMap::new();
+
+        // Start from the first odd candidate
+        let mut n: u128 = 3;
+
         loop {
-            let mut is_prime = true;
-            for p in primes.iter_mut() {
-                while p.1 < num {
-                    p.1 += p.0
+            if let Some(step) = composites.remove(&n) {
+                // n is composite; move this prime's marker to its next composite
+                let mut next = n + step;
+
+                // Avoid collisions: if some other prime already marked `next`,
+                // keep stepping until we find a free slot
+                while composites.contains_key(&next) {
+                    next += step;
                 }
-                if p.1 == num {
-                    is_prime = false;
-                    break;
+
+                composites.insert(next, step);
+            } else {
+                // n is not marked composite → it's prime
+                yield n;
+
+                // First composite we mark for this prime.
+                // Using n*n (classic Eratosthenes optimization):
+                // all smaller composites of n will already have a smaller prime factor.
+                let start = n.saturating_mul(n);
+                // Step is 2*n because we only visit odd numbers (n is odd)
+                let step = 2 * n;
+
+                // Only insert if we didn't overflow n*n
+                if start > n {
+                    // If multiple primes try to set the same composite,
+                    // we just keep the first step – duplicates are handled by the while loop above.
+                    if !composites.contains_key(&start) {
+                        composites.insert(start, step);
+                    } else {
+                        // If there's already something there, find the next free composite
+                        let mut next = start + step;
+                        while composites.contains_key(&next) {
+                            next += step;
+                        }
+                        composites.insert(next, step);
+                    }
+                } else {
+                    // Overflow zone for u128; at this point you can't safely do n*n anyway.
+                    // You could `break` here or just continue yielding primes by trial division.
                 }
             }
-            if is_prime {
-                primes.push((num, num));
-                yield num;
-            }
-            num += 2;
+            n += 2;
         }
     };
     generator::create_infinite_generator(c)
