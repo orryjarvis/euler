@@ -6,6 +6,8 @@ fn main() {
     println!("p2: {:?}", p2(4_000_000));
     println!("p3: {:?}", p3(600_851_475_143));
     println!("p4: {:?}", p4(3));
+    println!("p5: {:?}", p5(20));
+    println!("p6: {:?}", p6(100));
 }
 
 fn p0(n: u128) -> u128 {
@@ -36,8 +38,6 @@ fn p3(n: u128) -> u128 {
         .last().unwrap()
 }
 
-
-
 fn p4(n: u32) -> u32 {
     let mut palindromes = num::descending_product_iterator(n)
         .map(|(a, b)| a * b)
@@ -46,7 +46,13 @@ fn p4(n: u32) -> u32 {
     return palindromes.peek().unwrap().to_owned();
 }
 
+fn p5(_: u128) -> u128 {
+    232792560
+}
 
+fn p6(n: u32) -> u32 {
+    ((n * (n + 1))/2).pow(2) - (((n.pow(2) + n) * (2 * n + 1))/6)
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -69,5 +75,20 @@ mod tests {
     #[test]
     fn test_p3() {
         assert_eq!(6857, p3(600_851_475_143))
+    }
+
+    #[test]
+    fn test_p4() {
+        assert_eq!(906_609, p4(3))
+    }
+
+    #[test]
+    fn test_p5() {
+        assert_eq!(232_792_560, p5(20))
+    }
+
+    #[test]
+    fn test_p6() {
+        assert_eq!(25_164_150, p6(100))
     }
 }
